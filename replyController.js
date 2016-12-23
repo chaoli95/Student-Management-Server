@@ -3,7 +3,7 @@ var User = require('./models/user');
 var Reply = require('./models/reply');
 var Question = require('./models/question');
 
-exports.selectReplyByUserId = function(req,res){
+exports.selectReply = function(req,res){
     if(!req.session.user) {
 		res.end(JSON.stringify({code:1000,message:"请先登录"}));
 		//res.end();
@@ -33,7 +33,7 @@ exports.selectReplyByQuestionId = function(req,res){
    			res.end("[]");
    			throw err;
    		}else {
-   			res.send(JSON,stringify(replies));
+   			res.send(JSON.stringify(replies));
    			res.end();
    		}
    	});
@@ -45,7 +45,7 @@ exports.addReply = function(req,res){
 		res.end(JSON.stringify({code:1000,message:"请先登录"}));
 	}else {
 	    var newReply = new Reply({
-	    	userId : res.session.user,
+	    	userId : req.session.user,
 	     	questionId : req.body.questionId,
 			replyContent : req.body.replycontent
 	    });
@@ -60,3 +60,23 @@ exports.addReply = function(req,res){
 					}
 				});
 }}
+
+exports.selectReplyByUserId = function(req,res){
+    if(!req.session.user) {
+		res.end(JSON.stringify({code:1000,message:"请先登录"}));
+		//res.end();
+	}else {
+
+				Reply.find({"userId":req.query.userId}, function(err,replies ) {
+					
+					if(err) {
+						res.end("[]");
+						throw err;
+					} else {
+						res.send(JSON.stringify(replies));
+						res.end();
+					}
+				});
+			} 
+			}
+
