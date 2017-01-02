@@ -151,3 +151,14 @@ exports.addPost = function (req, res) {
 	}
 }
 
+exports.searchclasses = function(req,res){
+	    Class.find({"className":{"$regex":req.query.name, "$options":"i"}},function(err,results){
+		    if(err) {
+			    res.end(JSON.stringify({code:1013, message:"获取失败"}));
+		    } else {
+			    console.log(req.query.name);
+			    res.end(JSON.stringify(results));
+
+		    } 
+	    });
+}

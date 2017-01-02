@@ -62,26 +62,30 @@ exports.displayData = function(req,res){
 		}else{
 			var  str   =    req.body.questionDate;  
             var  day   =    new   Date(str.replace(/-/g,   "/"));
-            var  dayafter = day.setDate(now.getDate()+1);
-			Question.count({"questionDate":{"$gte": day, "$lt": dayafter},"classId":req.body.classId},function(err,countquestion){
-				if(err){
-					res.end(JSON.stringify({code:1009,message:"查询失败"}));
-				}else{
-					
-				}});
-            Question.count({"questionDate":{"$gte":day, "$lt": dayafter},"classId":req.body.classId,questionStatus:true},function(err,countmarkedquestion){
-            	if(err){
-            		res.end(JSON.stringify({code:1009,message:"查询失败"}));
-            	}else{
-
-            	}
-            });
-            if (countquestion==0)
-            	res.end(JSON.stringify({message:"此日无问题"}));
-            else{
-            	var ratio=countquestion/countmarkedquestion;
-            	res.end(JSON.stringify({numofquestion:countquestion,numofmarkedquestion:countmarkedquestion,rate:ratio}));
-            }
+            var  dayafter = new Date(str.replace(/-/g, "/"));
+		   dayafter.setDate(dayafter.getDate()+1);
+			   console.log(day);
+		    console.log(dayafter)
+		Question.count({"questionDate":{"$gte": day, "$lt": dayafter},"classId":req.body.classId},function(err,countquestion){
+			if(err){
+				res.end(JSON.stringify({code:1009,message:"查询失败"}));
+			}else{
+				console.log(countquestion);
+				Question.count({"questionDate":{"$gte":day, "$lt": dayafter},"classId":req.body.classId,questionStatus:true},function(err,countmarkedquestion){	            							if(err){
+            					res.end(JSON.stringify({code:1009,message:"查询失败"}));
+            				}else{
+						if (countquestion==0){
+       						     	res.end(JSON.stringify({message:"此日无问题"}));
+          					} else{
+            						var ratio=countquestion/countmarkedquestion;
+            						res.end(JSON.stringify({numofquestion:countquestion,numofmarkedquestion:countmarkedquestion,rate:ratio}));
+           					 }
+            				}
+            			});
+			}
+		});
+            
+            
 		}
 	}
 }
@@ -99,7 +103,7 @@ exports.remindTeacher = function(req,res){
 		  	else if(user.identity!=2)
 		  		res.end(JSON.stringify({code:1010,message:"此用户不是老师"}));
 		  	else{
-                User.update({"loginname":user.loginname},{$addToSet:{message:{_id:req.session.user,message:"请您及时关注班级同学的问题！"}}},function(err){
+                User.update({"loginname":user.loginname},{$addToSet:{message:{senderId:req.session.user,message:"请您及时关注班级同学的问题！"}}},function(err){
 					if(err){
 						res.end(JSON.stringify({code:1011,message:"提醒失败"}));
 					}else{
@@ -146,7 +150,7 @@ exports.groupMessage = function(req,res){
             if (!cla){
             	res.end(JSON.stringify({code:1004,message:"未找到用户"}));
             }else{
-            	Class.update({_id:cla.id},{$addToSet:{post:{postContent:req.bodycontent}}},function(err){
+            	Class.update({_id:cla.id},{$addToSet:{post:{postContent:req.body.content}}},function(err){
             		if(err) {
 						res.end(JSON.stringify({code:1002, message:"发送失败"}));
 					} else {

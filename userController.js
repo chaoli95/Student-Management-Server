@@ -1,6 +1,7 @@
 var User = require('./models/user');
 var question = require('./models/question');
 var reply = require('./models/question');
+var Broadcast = require('./models/broadcast');
 
 exports.login = function (req, res) {
   var loginname = req.body.loginname;
@@ -195,3 +196,14 @@ exports.sendMessage = function(req, res) {
 	}
 
 };
+
+exports.getBroadcast = function(req,res){
+	Broadcast.find({},  function(err, broadcasts) {
+					if(err) {
+						res.end(JSON.stringify({code:1004, message:"获取公告失败"}));
+					} else {
+						res.end(JSON.stringify({code:200,message:"成功", broadcasts:broadcasts}));
+						
+					}
+	})
+}
