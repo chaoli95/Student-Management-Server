@@ -16,9 +16,11 @@ exports.login = function (req, res) {
   	if(password == user.password) {
        		req.session.user = user._id;
   		req.session.identity = user.identity;
+		req.session.name = user.name;
     		console.log('session.user = '+req.session.user);
+		console.log('session.identity = ' + req.session.identity); 
 	    //   	res.send(JSON.stringify({ status:"success" }));//给客户端返回一个json格式的数据
-	    	res.end(JSON.stringify({code:200, message: "登录成功"}));
+	    	res.end(JSON.stringify({code:200, message: "登录成功", objectId: user._id, identity: user.identity, name:user.name}));
 
 	} else {
 		res.end(JSON.stringify({code: 1005, message:"密码错误"}));
@@ -51,7 +53,7 @@ exports.signup = function (req, res) {
     questionThree: req.body.questionThree,
     answerThree: req.body.answerThree
   });
-  console.log(user);
+  console.log(req.body.identity);
   User.findOne({loginname: user.loginname}, function(err, savedUser) {
 	  if(!savedUser) {
 		  user.save(function (err) {
@@ -129,4 +131,67 @@ exports.findPwd = function (req, res) {
 			});
 		}
 	});
+};
+
+exports.selectMessage = function (req, res) {
+	if (!req.session.user) {
+		res.end(JSON.stringify({code:1000, message:"请先登录", msg:[]}));
+	} else {
+		User.findById(req.session.user, function (err, user){
+			if (err) {
+				res.end(JSON.stringify({code:1002, message: "失败", msg:[]}));
+			} else {
+				res.end(JSON.stringify({code:200, message: "成功", msg:user.message}));
+			}
+		});
+	}
+};
+
+exports.selectUserInfo = function(req, res) {
+	User.findById(req.query.userId, {name:1, loginname:1, identity:1}, function (err, user) {
+		if (err) {
+			res.end(JSON.stringify({code: 1002, message: "失败", user:{}}));
+		} else {
+			res.end(JSON.stringify({code: 200, message: "成功",user:user}));
+		}
+	});	
+};
+
+exports.getMessage = function(req, res) {
+	if (!req.session.user) {
+		res.end(JSON.stringify({code:1000, message:"请先登录", msg:[]}));
+	} else {
+		User.findById(req.session.user, function(err, user){
+			console.log(user);
+			if(err) {
+				res.end(JSON.stringify({code:1002, message:"失败",msg:[]}));
+			} else {
+				res.end(JSON.stringify({code:200,message:"成功", msg:user.message}));
+			}
+		});
+	}
+
+};
+exports.sendMessage = function(req, res) {
+	console.log(req.body.studentName);
+	console.log(req.body.content);	
+	if (!req.session.user) {
+		res.end(JSON.stringify({code:1000, message:"请先登录"}));
+	} else {
+		User.findOne({loginname: req.body.studentName}, function(err, user){
+			if(err) {
+				res.end(JSON.stringify({code:1002, message:"失败"}));
+			} else {
+				console.log(user);
+				User.update({loginname:req.body.studentName}, {$addToSet:{message:{senderId:req.session.user,message:req.body.content }}},function(err) {
+					if(err) {
+						res.end(JSON.stringify({code:1002, message:"失败"}));
+					} else {
+						res.end(JSON.stringify({code:200, message:"成功"}));
+					}
+				});
+			}
+		});
+	}
+
 };

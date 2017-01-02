@@ -4,6 +4,7 @@ var Schema = mongoose.Schema,
 
 var classSchema = new Schema({
 	studentId :[ObjectId],
+	studentLoginName: [String],
 	teacherId :ObjectId,
 	className :String,
 	fileName :[String],

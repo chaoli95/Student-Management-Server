@@ -8,9 +8,10 @@ exports.addQuestion = function (req,res) {
                res.send(JSON.stringify({code:1000,message:"请先登录"}));
                res.end();
        }else {
-               if (req.session.identity==1){
+               if (req.session.identity==1) {
                var newQuestion = new Question({
                studentId:req.session.user,
+	       studentName:req.session.name,
                classId:req.body.classId,
                questionContent:req.body.questionContent      
                });

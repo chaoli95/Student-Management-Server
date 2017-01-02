@@ -3,10 +3,11 @@ var Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 var questionSchema = new Schema({
 	studentId : ObjectId,
+	studentName: String,
 	questionDate : { type: Date, default: Date.now },
 	questionContent: String,
 	questionStatus: { type :Boolean, default: false},
-    classId : ObjectId
+	classId : ObjectId
 }, {
     versionKey: false
 });

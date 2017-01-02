@@ -46,6 +46,8 @@ exports.addReply = function(req,res){
 	}else {
 	    var newReply = new Reply({
 	    	userId : req.session.user,
+		userName: req.session.name,
+		userIdentity: req.session.identity,
 	     	questionId : req.body.questionId,
 			replyContent : req.body.replycontent
 	    });

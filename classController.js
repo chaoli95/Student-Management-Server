@@ -3,9 +3,9 @@ var User = require('./models/user');
 var mongoose = require('mongoose');
 
 
-exports.selectPost = function (req, res) {
+//exports.selectPost = function (req, res) {
 	
-};
+//};
 
 exports.addClass = function (req, res) {
 	console.log(req.session.user);
@@ -61,7 +61,7 @@ exports.selectClass = function (req, res) {
 				});
 			} else if (req.session.identity == 2) {
 				Class.find({"teacherId": req.session.user}, { __v:0}, function(err, classes) {
-					console.log(classes);
+					console.log("hello");
 					if(err) {
 						res.end("[]");
 //						res.end();
@@ -150,3 +150,4 @@ exports.addPost = function (req, res) {
 		res.end(JSON.stringify({code:1001, message:"用户权限不够"}));
 	}
 }
+
