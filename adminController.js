@@ -75,10 +75,10 @@ exports.displayData = function(req,res){
             					res.end(JSON.stringify({code:1009,message:"查询失败"}));
             				}else{
 						if (countquestion==0){
-       						     	res.end(JSON.stringify({message:"此日无问题"}));
+       						     	res.end(JSON.stringify({code:1009,message:"此日无问题"}));
           					} else{
             						var ratio=countquestion/countmarkedquestion;
-            						res.end(JSON.stringify({numofquestion:countquestion,numofmarkedquestion:countmarkedquestion,rate:ratio}));
+            						res.end(JSON.stringify({code:200,message:"成功",numofquestion:countquestion,numofmarkedquestion:countmarkedquestion,rate:ratio}));
            					 }
             				}
             			});
@@ -97,21 +97,30 @@ exports.remindTeacher = function(req,res){
 		if (req.session.identity!=0){
 			res.end(JSON.stringify({code:1001,message:"权限不足"}));
 		}else{
-		  User.findOne({"loginname":req.body.loginname},function(err,user){
-		  	if(!user)
-		  		res.end(JSON.stringify({code:1004,message:"未找到用户"}));
-		  	else if(user.identity!=2)
-		  		res.end(JSON.stringify({code:1010,message:"此用户不是老师"}));
-		  	else{
-                User.update({"loginname":user.loginname},{$addToSet:{message:{senderId:req.session.user,message:"请您及时关注班级同学的问题！"}}},function(err){
-					if(err){
+			Class.findById(req.body.classId, function(err, classObject){
+				User.findByIdAndUpdate(classObject.teacherId,{$addToSet:{message:{senderId:req.session.user,message:"请您及时关注班级同学的问题！"}}},function(err){
+						if(err){
 						res.end(JSON.stringify({code:1011,message:"提醒失败"}));
 					}else{
 						res.end(JSON.stringify({code:200,message:"提醒成功"}));
-					}	
-				    });   
-		  	}
-		  });
+					}		
+				});
+			});
+//		  User.findOne({"loginname":req.body.loginname},function(err,user){
+//		  	if(!user)
+//		  		res.end(JSON.stringify({code:1004,message:"未找到用户"}));
+//		  	else if(user.identity!=2)
+//		  		res.end(JSON.stringify({code:1010,message:"此用户不是老师"}));
+//		  	else{
+  //              User.update({"loginname":user.loginname},{$addToSet:{message:{senderId:req.session.user,message:"请您及时关注班级同学的问题！"}}},function(err){
+//					if(err){
+//						res.end(JSON.stringify({code:1011,message:"提醒失败"}));
+//					}else{
+//						res.end(JSON.stringify({code:200,message:"提醒成功"}));
+//					}	
+//				    });   
+//		  	}
+//		  });
 		}
 	}
 }
